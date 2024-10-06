@@ -4,4 +4,4 @@
 
 <p>A interface to control is not implemented</p>
 
-<p>In Main.java, is a simple example to use</p>
+<p>In <code>Main</code> class, is a simple example to use</p>
