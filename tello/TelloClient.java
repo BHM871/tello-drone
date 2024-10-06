@@ -15,19 +15,19 @@ import abstracts.Client;
 
 public class TelloClient implements Client {
 
-    private String ip;
-    private int port;
+	private String ip;
+	private int port;
 	private int timeout;
 	private InetAddress address = null;
 	private DatagramSocket dataSocket = null;
 
 	private Logger logger = Logger.getLogger(Client.class.getName());
-	
-	public TelloClient(){
+
+	public TelloClient() {
 		this("192.168.10.1", 8889, 15);
 	}
 
-	public TelloClient(int timeout){
+	public TelloClient(int timeout) {
 		this("192.168.10.1", 8889, timeout);
 	}
 
@@ -41,99 +41,99 @@ public class TelloClient implements Client {
 		this.timeout = timeout;
 	}
 
-    public String getIp() {
-        return ip;
-    }
+	public String getIp() {
+		return ip;
+	}
 
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
 
-    public int getPort() {
-        return port;
-    }
+	public int getPort() {
+		return port;
+	}
 
-    public void setPorta(int port) {
-        this.port = port;
-    }
+	public void setPorta(int port) {
+		this.port = port;
+	}
 
 	protected boolean canEstablishConnection() {
 		try {
-            address = InetAddress.getByName(ip);
+			address = InetAddress.getByName(ip);
 
-	        if (dataSocket == null) {
-                dataSocket = new DatagramSocket(port);
-				dataSocket.setSoTimeout(timeout*1000);
+			if (dataSocket == null) {
+				dataSocket = new DatagramSocket(port);
+				dataSocket.setSoTimeout(timeout * 1000);
 			}
 
 			dataSocket.connect(address, port);
 			dataSocket.disconnect();
 
 			return true;
-        } catch (UnknownHostException ex) {
-            logger.log(Level.SEVERE, "Host Not Found", ex);
-        } catch (SocketException ex) {
-            logger.log(Level.SEVERE, "Port Is Not Open", ex);
+		} catch (UnknownHostException ex) {
+			logger.log(Level.SEVERE, "Host Not Found", ex);
+		} catch (SocketException ex) {
+			logger.log(Level.SEVERE, "Port Is Not Open", ex);
 		}
 
 		return false;
 	}
 
 	public DatagramPacket getPacket(String message) {
-		if(address == null && !canEstablishConnection()) {
+		if (address == null && !canEstablishConnection()) {
 			throw new RuntimeException("Address Don´t Defined");
 		}
 
-        byte buf[] = null;
-        buf = message.getBytes();
-        return new DatagramPacket(buf, buf.length, address, port);
+		byte buf[] = null;
+		buf = message.getBytes();
+		return new DatagramPacket(buf, buf.length, address, port);
 	}
 
 	public void sendPacket(DatagramPacket packet) throws IOException {
 		try {
-            dataSocket.send(packet);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "DatagramPacket Can´t Sended", ex);
+			dataSocket.send(packet);
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, "DatagramPacket Can´t Sended", ex);
 			throw new IOException(ex);
-        }
+		}
 	}
 
 	public String getRecivedAnswer() throws IOException {
-        byte[] receivedBytes = new byte[1024];
-        final DatagramPacket receivedPacket = new DatagramPacket(receivedBytes, receivedBytes.length);
+		byte[] receivedBytes = new byte[1024];
+		final DatagramPacket receivedPacket = new DatagramPacket(receivedBytes, receivedBytes.length);
 
-        try {
-            dataSocket.receive(receivedPacket);
+		try {
+			dataSocket.receive(receivedPacket);
 			return packetToString(receivedBytes, receivedPacket);
-        } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Response Don´t Received, Timeout!", ex);
+		} catch (IOException ex) {
+			logger.log(Level.SEVERE, "Response Don´t Received, Timeout!", ex);
 			throw ex;
-        }
+		}
 	}
 
-    protected String packetToString(byte[] receivedBytes, DatagramPacket receivedPacket) {
-        receivedBytes = Arrays.copyOf(receivedBytes, receivedPacket.getLength());
-        return new String(receivedBytes, StandardCharsets.UTF_8).trim();
-    }
+	protected String packetToString(byte[] receivedBytes, DatagramPacket receivedPacket) {
+		receivedBytes = Arrays.copyOf(receivedBytes, receivedPacket.getLength());
+		return new String(receivedBytes, StandardCharsets.UTF_8).trim();
+	}
 
 	public void closeConnection() throws SocketException {
-        try {
-            dataSocket.setReuseAddress(false);
+		try {
+			dataSocket.setReuseAddress(false);
 			dataSocket.disconnect();
-        } catch (SocketException ex) {
-            logger.log(Level.SEVERE, "Can´t Setup Address Reuse", ex);
+		} catch (SocketException ex) {
+			logger.log(Level.SEVERE, "Can´t Setup Address Reuse", ex);
 			throw ex;
-        }
+		}
 	}
 
-    public String sendMessage(String mensagem) throws Exception {
+	public String sendMessage(String mensagem) throws Exception {
 		try {
 			logger.info("Sending command: " + mensagem);
 			sendPacket(getPacket(mensagem));
 
 			String received = getRecivedAnswer();
 			logger.info("Received message: " + received);
-			
+
 			closeConnection();
 
 			return received;
@@ -141,11 +141,11 @@ public class TelloClient implements Client {
 			logger.log(Level.SEVERE, "Can´t Execute This Command", e);
 			throw e;
 		}
-    }
+	}
 
 	@Override
 	public void finish() {
-		if(dataSocket != null && dataSocket.isClosed())
+		if (dataSocket != null && dataSocket.isClosed())
 			dataSocket.close();
 	}
 }

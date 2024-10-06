@@ -14,23 +14,26 @@ public abstract class Command {
 
 	public String getCommand() throws IOException {
 		validateInputs();
-		
+
 		return value;
 	}
 
 	public boolean execute(Client client) throws Exception {
 		validateInputs();
-		
-		if(isExcuted) throw new IOException("Command Already Executed");
-		if(client == null) return false;
-		
+
+		if (isExcuted)
+			throw new IOException("Command Already Executed");
+		if (client == null)
+			return false;
+
 		received = client.sendMessage(getCommand());
 		isExcuted = true;
 		return isWorked();
 	}
 
 	public boolean isWorked() {
-		if(!isExcuted || received == null) return false;
+		if (!isExcuted || received == null)
+			return false;
 		return received.equals("ok");
 	}
 
