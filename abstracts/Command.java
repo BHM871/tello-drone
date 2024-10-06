@@ -18,19 +18,15 @@ public abstract class Command {
 		return value;
 	}
 
-	public boolean execute(Client client) throws IOException{
+	public boolean execute(Client client) throws Exception {
 		validateInputs();
 		
 		if(isExcuted) throw new IOException("Command Already Executed");
 		if(client == null) return false;
 		
-		try{
-			received = client.sendMessage(getCommand());
-			isExcuted = true;
-			return isWorked();
-		} catch (Exception e) {
-			return false;
-		}
+		received = client.sendMessage(getCommand());
+		isExcuted = true;
+		return isWorked();
 	}
 
 	public boolean isWorked() {

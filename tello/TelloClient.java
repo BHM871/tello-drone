@@ -126,7 +126,7 @@ public class TelloClient implements Client {
         }
 	}
 
-    public String sendMessage(String mensagem) {
+    public String sendMessage(String mensagem) throws Exception {
 		try {
 			logger.info("Sending command: " + mensagem);
 			sendPacket(getPacket(mensagem));
@@ -139,7 +139,7 @@ public class TelloClient implements Client {
 			return received;
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Can´t Execute This Command", e);
-			return "error";
+			throw e;
 		}
     }
 

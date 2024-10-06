@@ -101,8 +101,9 @@ public class TelloDrone implements Drone {
 			return received != null ? received : "error";
 		} catch (Exception e) {
 			try {
-				logger.log(Level.SEVERE, "Can´t Execute Command: " + command.getCommand());
+				logger.log(Level.SEVERE, "Can´t Execute Command: " + command.getCommand(), e);
 			} catch (IOException ex) {
+				logger.log(Level.SEVERE, e, null);
 			}
 
 			return "error";
